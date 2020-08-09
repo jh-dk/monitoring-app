@@ -136,7 +136,7 @@ data:
       dir = "/data/data"
       wal-dir = "/data/wal"
       wal-fsync-delay = "0s"
-      index-version = "inmem"
+      index-version = "tsi1"
       query-log-enabled = true
       cache-max-memory-size = 1073741824 # 1g
       cache-snapshot-memory-size = 26214400 # 25m

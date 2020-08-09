@@ -5,7 +5,7 @@ GRAFANA_VERSION := 6.7.4
 # TODO: heapster is marked as deprecated project and will be removed in k8s 1.13
 # https://github.com/kubernetes/heapster/blob/master/docs/deprecation.md
 HEAPSTER_VERSION := 1.5.4
-INFLUXDB_VERSION := 1.5.2
+INFLUXDB_VERSION := 1.8.1
 KAPACITOR_VERSION := 1.5.0
 TELEGRAF_VERSION := 1.11.5
 
