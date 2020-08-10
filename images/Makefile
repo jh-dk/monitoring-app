@@ -38,14 +38,8 @@ heapster-clean:
 heapster: heapster-build
 	$(MAKE) -e BUILDIMAGE=$(HEAPSTER_TAG) TARGETDIR=$@ make-docker-image
 
-influxdb-build:
-	$(MAKE) -C $(PWD)/influxdb -e VER=v$(INFLUXDB_VERSION) TARGET=influxd TARGETDIR=influxdb -f $(PWD)/buildbox.mk
-
-influxdb-clean:
-	$(MAKE) -C $(PWD)/influxdb clean
-
-influxdb: influxdb-build
-	$(MAKE) -e BUILDIMAGE=$(INFLUXDB_TAG) TARGETDIR=$@ make-docker-image
+influxdb:
+	$(MAKE) -e BUILDIMAGE=$(INFLUXDB_TAG) EXTRA_ARGS="--build-arg INFLUXDB_VERSION=$(INFLUXDB_VERSION)" TARGETDIR=$@ make-docker-image
 
 grafana:
 	$(MAKE) -e BUILDIMAGE=$(GRAFANA_TAG) EXTRA_ARGS="--build-arg GRAFANA_VERSION=$(GRAFANA_VERSION)" TARGETDIR=$@ make-docker-image
@@ -58,7 +52,7 @@ telegraf:
 
 all: heapster influxdb grafana kapacitor telegraf hook
 
-clean: heapster-clean influxdb-clean
+clean: heapster-clean
 
 .PHONY: deploy
 deploy:
