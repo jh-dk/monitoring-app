@@ -12,7 +12,6 @@ MTA_IMAGE_VERSION := 1.0.0
 
 IMPORT_IMAGE_FLAGS := --set-image=monitoring-grafana:$(VERSION) \
 	--set-image=monitoring-hook:$(VERSION) \
-	--set-image=monitoring-mta:$(MTA_IMAGE_VERSION) \
 	--set-image=watcher:$(VERSION)
 
 IMPORT_OPTIONS := --vendor \
@@ -28,6 +27,17 @@ IMPORT_OPTIONS := --vendor \
 	--name=$(NAME) \
 	--version=$(VERSION) \
 	$(IMPORT_IMAGE_FLAGS)
+
+UNAME := $(shell uname | tr A-Z a-z)
+define replace
+	sed -i $1 $2
+endef
+
+ifeq ($(UNAME),darwin)
+define replace
+	sed -i '' $1 $2
+endef
+endif
 
 .PHONY: package
 package:
@@ -47,7 +57,8 @@ hook:
 	$(MAKE) -C images hook
 
 .PHONY: import
-import: package
+import: package update-charts-version
+	echo "image:\n  tag: $(VERSION)" > resources/custom-values-watcher.yaml
 	-$(GRAVITY) app delete \
 		--ops-url=$(OPS_URL) \
 		$(REPOSITORY)/$(NAME):$(VERSION) \
@@ -56,6 +67,8 @@ import: package
 		$(IMPORT_OPTIONS) \
 		$(EXTRA_GRAVITY_OPTIONS) \
 		--include=resources --include=registry .
+	$(call replace,"s/$(VERSION)/0.1.0/g",resources/charts/nethealth/Chart.yaml)
+	$(call replace,"s/$(VERSION)/0.1.0/g",resources/charts/watcher/Chart.yaml)
 
 .PHONY: tarball
 tarball: import
@@ -68,3 +81,8 @@ tarball: import
 .PHONY: clean
 clean:
 	$(MAKE) -C watcher clean
+
+.PHONY: update-charts-version
+update-charts-version:
+	$(call replace,"s/0.1.0/$(VERSION)/g",resources/charts/nethealth/Chart.yaml)
+	$(call replace,"s/0.1.0/$(VERSION)/g",resources/charts/watcher/Chart.yaml)
